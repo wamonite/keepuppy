@@ -1,6 +1,6 @@
 from setuptools import setup
 
-with open('README.md', 'r') as f:
+with open('README.rst', 'r') as f:
     readme = f.read()
 
 setup(
@@ -25,7 +25,7 @@ setup(
     ],
     packages = ['keepuppy'],
     package_data = {
-      'keepuppy': ['README.md', 'LICENSE', 'requirement.txt']
+      'keepuppy': ['README.rst', 'LICENSE', 'requirement.txt']
     },
     scripts = ['keepuppy_sync.py', 'keepuppy_restart.py'],
     install_requires = ['paramiko>=1.15.1', 'psutil>=2.1.3'],
