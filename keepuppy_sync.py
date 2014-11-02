@@ -8,10 +8,6 @@ import sys
 import keepuppy
 import logging
 import os
-import psutil
-import signal
-from time import sleep
-import shlex
 import subprocess
 
 
@@ -20,8 +16,6 @@ DEFAULT_LOG_STREAM = sys.stderr
 DEFAULT_CACHE_FILE = '~/.keepuppy_cache.json'
 DEFAULT_HOST_NAME = 'localhost'
 DEFAULT_HOST_PORT = 22
-DEFAULT_RESTART_APP = 'KeePassX'
-DEFAULT_RESTART_TIMEOUT = 30
 
 
 class OptionError(Exception):
@@ -34,8 +28,7 @@ class Options(object):
         'cache_file': ('KEEPUPPY_CACHE_FILE', DEFAULT_CACHE_FILE, True),
         'local_file': ('KEEPUPPY_LOCAL_FILE', None, True),
         'remote_file': ('KEEPUPPY_REMOTE_FILE', None, True),
-        'restart_app': ('KEEPUPPY_RESTART_APP', DEFAULT_RESTART_APP, False),
-        'restart_timeout': ('KEEPUPPY_RESTART_TIMEOUT', DEFAULT_RESTART_TIMEOUT, False),
+        'restart_command': ('KEEPUPPY_RESTART_COMMAND', None, False),
         'remote_user_name': ('KEEPUPPY_SFTP_USER_NAME', None, False),
         'remote_password': ('KEEPUPPY_SFTP_PASSWORD', None, False),
         'remote_host_name': ('KEEPUPPY_SFTP_HOST_NAME', DEFAULT_HOST_NAME, True),
@@ -67,42 +60,29 @@ def enable_logging(log_level = DEFAULT_LOG_LEVEL, log_stream = DEFAULT_LOG_STREA
     log.addHandler(log_handler)
 
 
-def restart_app(options):
+def restart_command(options):
 
-    def find_pid_of_process(name):
-        pid_list = psutil.pids()
-        for pid in pid_list:
+    def restart_command_func(file_object):
+        if options.restart_command:
             try:
-                proc = psutil.Process(pid)
-                if proc.name() == name:
-                    return pid
+                cmd = options.restart_command
+                cmd = cmd.replace('[file_name]', file_object.name)
+                print('Calling restart command (%s)' % cmd)
 
-            except psutil.NoSuchProcess:
-                pass
+                output = subprocess.check_output(cmd,
+                                                 stderr = subprocess.STDOUT,
+                                                 shell = True)
+                if output:
+                    print('Restart command output\n----\n%s\n----' % output)
 
-        return None
+            except subprocess.CalledProcessError as ex:
+                msg = 'Restart command failed (%s)' % ex
+                if ex.output:
+                    msg += '\n----\n%s\n----' % ex.output
 
-    def restart_app_func(file_object):
-        if options.restart_app:
-            pid = find_pid_of_process(options.restart_app)
-            os.kill(pid, signal.SIGTERM)
+                print(msg)
 
-        pid = None
-        while range(options.restart_timeout):
-            pid = find_pid_of_process(options.restart_app)
-
-            if pid is None:
-                break
-
-            sleep(1)
-
-        if pid is None:
-            cmd = "open -a '%s'" % options.restart_app
-            subprocess.call(shlex.split(cmd))
-
-        return None
-
-    return restart_app_func
+    return restart_command_func
 
 
 def do_sync(options):
@@ -115,20 +95,20 @@ def do_sync(options):
                                     options.remote_host_port)
 
     hash_cache = keepuppy.HashCache(options.cache_file)
-    syncer = keepuppy.Syncer(hash_cache, restart_app(options))
+    syncer = keepuppy.Syncer(hash_cache, restart_command(options))
     status = syncer.sync(file_local, file_remote)
     if status is not None:
         print(status)
 
 
-def run_keepuppy():
+def keepuppy_sync():
     enable_logging()
     options = Options()
     do_sync(options)
 
 if __name__ == "__main__":
     try:
-        run_keepuppy()
+        keepuppy_sync()
 
     except (OptionError, keepuppy.FileException, keepuppy.HashCacheException, keepuppy.SyncException) as e:
         print('Error:', e, file = sys.stderr)

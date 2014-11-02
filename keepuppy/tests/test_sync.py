@@ -254,6 +254,7 @@ class TestSyncLogic(object):
         self.syncer = Syncer(hash_cache)
         self.syncer._copy_file = MagicMock()
         self.syncer._create_backup = MagicMock()
+        self.syncer._local_update = MagicMock()
 
         self.hash_lookup = {}
 
@@ -265,7 +266,7 @@ class TestSyncLogic(object):
         arg_names = ['last_changed', 'file_hash', 'created', 'updated']
         return dict(zip(arg_names, args))
 
-    def check_calls(self, copy_file_args, create_backup):
+    def check_calls(self, copy_file_args, backup_args, update_func):
         if copy_file_args:
             eq_(len(self.syncer._copy_file.call_args_list), 1)
             eq_(self.syncer._copy_file.call_args_list[0][0], copy_file_args)
@@ -273,13 +274,20 @@ class TestSyncLogic(object):
         else:
             eq_(len(self.syncer._copy_file.call_args_list), 0)
 
-        eq_(len(self.syncer._create_backup.call_args_list) == 1, create_backup)
+        if backup_args:
+            eq_(len(self.syncer._create_backup.call_args_list), 1)
+            eq_(self.syncer._create_backup.call_args_list[0][0], backup_args)
+
+        else:
+            eq_(len(self.syncer._create_backup.call_args_list), 0)
+
+        eq_(len(self.syncer._local_update.call_args_list) == 1, update_func)
 
     TestParams = namedtuple('TestParams', ['exception_thrown',
                                            'local_exists', 'local_hash', 'local_created', 'local_updated',
                                            'remote_exists', 'remote_hash', 'remote_created', 'remote_updated',
                                            'time_offset',
-                                           'copy_file_args', 'create_backup'])
+                                           'copy_file_args', 'backup_args', 'update_func'])
 
     def check_logic(self, test_params):
         tp = test_params
@@ -306,26 +314,30 @@ class TestSyncLogic(object):
         else:
             assert_raises(tp.exception_thrown, self.syncer.sync, self.local, self.remote)
 
-        self.check_calls(tp.copy_file_args, tp.create_backup)
+        self.check_calls(tp.copy_file_args, tp.backup_args, tp.update_func)
 
     def test_logic(self):
         copy_from_remote = (self.remote, self.local)
         copy_to_remote = (self.local, self.remote)
+        backup = (self.local,)
+        conflict = (self.local, True)
         check_logic_arg_list = [
-            (SyncException, False, '', False, False, False, '', False, False, 0, None, False),
-            (None, True, 'abcd', False, False, False, '', False, False, 0, copy_to_remote, False),
-            (None, False, '', False, False, True, 'abcd', False, False, 0, copy_from_remote, False),
-            (None, True, 'abcd', False, False, True, 'abcd', False, False, 0, None, False),
-            (None, True, 'abcd', False, False, True, 'efgh', False, False, 1, copy_from_remote, False),
-            (None, True, 'abcd', True, False, True, 'efgh', True, False, 1, copy_from_remote, True),
-            (None, True, 'abcd', False, True, True, 'efgh', True, False, 1, copy_from_remote, True),
-            (None, True, 'abcd', True, False, True, 'efgh', False, True, 1, copy_from_remote, True),
-            (None, True, 'abcd', False, True, True, 'efgh', False, True, 1, copy_from_remote, True),
-            (None, True, 'abcd', False, False, True, 'efgh', False, False, -1, copy_to_remote, False),
-            (None, True, 'abcd', True, False, True, 'efgh', True, False, -1, copy_to_remote, True),
-            (None, True, 'abcd', False, True, True, 'efgh', True, False, -1, copy_to_remote, True),
-            (None, True, 'abcd', True, False, True, 'efgh', False, True, -1, copy_to_remote, True),
-            (None, True, 'abcd', False, True, True, 'efgh', False, True, -1, copy_to_remote, True),
+            (SyncException, False, '', False, False, False, '', False, False, 0, None, None, False),
+            (None, True, 'abcd', False, False, False, '', False, False, 0, copy_to_remote, None, False),
+            (None, False, '', False, False, True, 'abcd', False, False, 0, copy_from_remote, None, True),
+            (None, True, 'abcd', False, False, True, 'abcd', False, False, 0, None, None, False),
+
+            (None, True, 'abcd', False, False, True, 'efgh', False, False, 1, copy_from_remote, backup, True),
+            (None, True, 'abcd', True, False, True, 'efgh', True, False, 1, copy_from_remote, conflict, True),
+            (None, True, 'abcd', False, True, True, 'efgh', True, False, 1, copy_from_remote, conflict, True),
+            (None, True, 'abcd', True, False, True, 'efgh', False, True, 1, copy_from_remote, conflict, True),
+            (None, True, 'abcd', False, True, True, 'efgh', False, True, 1, copy_from_remote, conflict, True),
+
+            (None, True, 'abcd', False, False, True, 'efgh', False, False, -1, copy_to_remote, None, False),
+            (None, True, 'abcd', True, False, True, 'efgh', True, False, -1, copy_to_remote, conflict, False),
+            (None, True, 'abcd', False, True, True, 'efgh', True, False, -1, copy_to_remote, conflict, False),
+            (None, True, 'abcd', True, False, True, 'efgh', False, True, -1, copy_to_remote, conflict, False),
+            (None, True, 'abcd', False, True, True, 'efgh', False, True, -1, copy_to_remote, conflict, False),
         ]
 
         for check_logic_args in check_logic_arg_list:

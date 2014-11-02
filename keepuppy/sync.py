@@ -111,34 +111,40 @@ class Syncer(object):
         elif not info_local:
             self._copy_file(file_remote, file_local)
 
-            if self._func_local_update:
-                self._func_local_update(file_local)
+            self._local_update(file_local)
 
-            return 'Local file missing, copying remote'
+            return 'Local file missing, copied from remote'
 
         elif not info_remote:
             self._copy_file(file_local, file_remote)
 
-            return 'Remote file missing, copying local'
+            return 'Remote file missing, copied to remote'
 
         if info_local.get('file_hash') == info_remote.get('file_hash'):
             return 'Files are up to date'
 
+        backed_up = False
         file_new_local = info_local.get('created') or info_local.get('updated')
         file_new_remote = info_remote.get('created') or info_remote.get('updated')
         if file_new_local and file_new_remote:
             log.warning('Local and remote files have both been modified so creating backup')
-            self._create_backup(file_local, conflict = True)
+            self._create_backup(file_local, True)
+            backed_up = True
 
         if info_local.get('last_changed') > info_remote.get('last_changed'):
             self._copy_file(file_local, file_remote)
 
-            return 'Local file most recent, copying remotely'
+            return 'Local file most recent, copied to remote'
 
         else:
+            if not backed_up:
+                self._create_backup(file_local)
+
             self._copy_file(file_remote, file_local)
 
-            return 'Remote file most recent, copying locally'
+            self._local_update(file_local)
+
+            return 'Remote file most recent, copied from remote'
 
     def _copy_file(self, file_source, file_destination):
         try:
@@ -162,3 +168,7 @@ class Syncer(object):
 
         except (FileException, IOError) as e:
             raise SyncException('Failed to create file backup', e)
+
+    def _local_update(self, file_object):
+        if self._func_local_update:
+            self._func_local_update(file_object)
