@@ -30,6 +30,6 @@ setup(
     scripts = ['keepuppy_sync.py', 'keepuppy_restart.py'],
     install_requires = ['paramiko>=1.15.1', 'psutil>=2.1.3'],
     setup_requires = ['nose>=1.3.4'],
-    tests_require = ['sftpserver>=0.2', 'mock>=1.0.2'],
+    tests_require = ['sftpserver>=0.2', 'mock>=1.0.1'],
     zip_safe = False
 )
