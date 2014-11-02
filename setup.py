@@ -5,7 +5,7 @@ with open('README.rst', 'r') as f:
 
 setup(
     name = 'keepuppy',
-    version = '1.0.1',
+    version = '1.0.2',
     description = 'KeePass database SFTP sync.',
     long_description = readme,
     license = 'MIT',
@@ -30,6 +30,6 @@ setup(
     scripts = ['keepuppy_sync.py', 'keepuppy_restart.py'],
     install_requires = ['paramiko>=1.15.1', 'psutil>=2.1.3'],
     setup_requires = ['nose>=1.3.4'],
-    tests_require = ['sftpserver>=0.2', 'mock>=1.0.1'],
+    tests_require = ['sftpserver>=0.2', 'mock>=1.0.2'],
     zip_safe = False
 )
