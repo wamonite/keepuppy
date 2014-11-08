@@ -5,7 +5,7 @@ keepuppy
 """
 
 __title__ = 'keepuppy'
-__version__ = '1.0.6'
+__version__ = '1.0.7'
 __author__ = 'Warren Moore'
 __license__ = 'MIT'
 __copyright__ = 'Copyright (c) 2014 Warren Moore'
