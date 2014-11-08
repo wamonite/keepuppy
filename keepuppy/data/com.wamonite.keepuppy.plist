@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.wamonite.keepuppy</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/username/.virtualenvs/keepuppy/bin/envdir</string>
+    <string>/Users/username/envdir/keepuppy/</string>
+    <string>/Users/username/.virtualenvs/keepuppy/bin/keepuppy_sync.py</string>
+  </array>
+
+  <key>Nice</key>
+  <integer>1</integer>
+
+  <key>StartInterval</key>
+  <integer>360</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/keepuppy.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/keepuppy_error.log</string>
+</dict>
+</plist>

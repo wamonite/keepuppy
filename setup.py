@@ -25,7 +25,8 @@ setup(
     ],
     packages = ['keepuppy'],
     package_data = {
-      'keepuppy': ['README.rst', 'LICENSE', 'requirement.txt']
+        '': ['README.rst', 'LICENSE', 'requirements.txt'],
+        'keepuppy': ['data/com.wamonite.keepuppy.plist']
     },
     scripts = ['keepuppy_sync.py', 'keepuppy_restart.py'],
     install_requires = ['paramiko>=1.15.1', 'psutil>=2.1.3'],
