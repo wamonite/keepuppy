@@ -5,7 +5,7 @@ with open('README.rst', 'r') as f:
 
 setup(
     name = 'keepuppy',
-    version = '1.0.3',
+    version = '1.0.4',
     description = 'KeePass database SFTP sync.',
     long_description = readme,
     license = 'MIT',
