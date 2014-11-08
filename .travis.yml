@@ -11,3 +11,7 @@ deploy:
     secure: cVV0+nwn5SjwnUbBVvshce5dO6EneIbs4EcsztP1bCT0I8PC18IMPPhx8F0hEAdK0WvL0VZglruf/1zJlti0o/OzZEeleux8/uJ/4pbmQp7HOPSnwnKDlt4xzRgS9H+UavnnInBkBI2Qh08YnfEhiuek3wgdexcQlxhb/E0BDqU=
   on:
     tags: true
+    all_branches: true
+branches:
+  only:
+    - master
