@@ -29,8 +29,8 @@ setup(
         'keepuppy': ['data/com.wamonite.keepuppy.plist']
     },
     scripts = ['keepuppy_sync.py', 'keepuppy_restart.py'],
-    install_requires = ['paramiko==1.15.2', 'psutil==2.2.1'],
-    setup_requires = ['nose==1.3.4'],
-    tests_require = ['sftpserver==0.2', 'mock==1.0.1'],
+    install_requires = ['paramiko==2.1.2', 'psutil==5.2.2'],
+    setup_requires = ['nose==1.3.7'],
+    tests_require = ['sftpserver==0.3', 'mock==2.0.0'],
     zip_safe = False
 )
