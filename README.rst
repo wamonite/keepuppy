@@ -10,9 +10,6 @@ Keepuppy
 .. image:: https://travis-ci.org/wamonite/keepuppy.svg?branch=master
     :target: https://travis-ci.org/wamonite/keepuppy
 
-.. image:: https://requires.io/github/wamonite/keepuppy/requirements.svg?branch=master
-    :target: https://requires.io/github/wamonite/keepuppy/requirements/?branch=master
-
 Keepuppy is a Python package and associated scripts to keep a Keepass database file in sync between the local filesystem of multiple clients and an SFTP server. Optionally a command can be executed if the local file is updated. An example script is provided to restart KeePassX.
 
 Scripts
