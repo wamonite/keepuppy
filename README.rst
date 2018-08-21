@@ -7,9 +7,6 @@ Keepuppy
 .. image:: http://img.shields.io/github/tag/wamonite/keepuppy.svg
     :target: https://github.com/wamonite/keepuppy
 
-.. image:: http://img.shields.io/pypi/v/keepuppy.svg
-    :target: https://pypi.python.org/pypi/keepuppy
-
 .. image:: https://travis-ci.org/wamonite/keepuppy.svg?branch=master
     :target: https://travis-ci.org/wamonite/keepuppy
 
